@@ -7,13 +7,12 @@
  * @global window;
  * @factory Vue
  */
-(function (global, factory) {  
+(function (global, factory) {
   /**
    * 兼容 vue 的加载方式
    * module.exports -> commonjs
    * define -> require.js
    */
-
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
     typeof define === 'function' && define.amd ? define(factory) :
     (global.Vue = factory());
@@ -23,14 +22,12 @@
 
   /**
    * Object.freeze  冻结一个对象 一旦冻结这个对象是不能被修改的
-   * 
    */
   var emptyObject = Object.freeze({});
-  console.log(emptyObject);
-  
-  debugger;
+
   // these helpers produces better vm code in JS engines due to their
   // explicitness and function inlining
+  // 提供的一些快捷方法
   function isUndef(v) {
     return v === undefined || v === null
   }
@@ -49,6 +46,7 @@
 
   /**
    * Check if value is primitive
+   * 检查 value 是否为原始类型 null undefined 除外
    */
   function isPrimitive(value) {
     return (
@@ -64,6 +62,8 @@
    * Quick object check - this is primarily used to tell
    * Objects from primitive values when we know the value
    * is a JSON-compliant type.
+   * 快速过滤null并检查是否为object
+   * 这里是不能区分数组，函数的
    */
   function isObject(obj) {
     return obj !== null && typeof obj === 'object'
@@ -71,9 +71,13 @@
 
   /**
    * Get the raw type string of a value e.g. [object Object]
+   * 取出toString方法，方便以后使用
    */
   var _toString = Object.prototype.toString;
 
+  /**
+   * 检查 value 类型
+   */
   function toRawType(value) {
     return _toString.call(value).slice(8, -1)
   }
@@ -81,17 +85,22 @@
   /**
    * Strict object type check. Only returns true
    * for plain JavaScript objects.
+   * 判断是否为真实的对象
    */
   function isPlainObject(obj) {
     return _toString.call(obj) === '[object Object]'
   }
 
+  /** 
+   * 快速获取 v 是否为 RegExp 类型
+   */
   function isRegExp(v) {
     return _toString.call(v) === '[object RegExp]'
   }
 
   /**
    * Check if val is a valid array index.
+   * 检查val是否是有效的数组索引。
    */
   function isValidArrayIndex(val) {
     var n = parseFloat(String(val));
@@ -100,6 +109,7 @@
 
   /**
    * Convert a value to a string that is actually rendered.
+   * 转化成字符串
    */
   function toString(val) {
     return val == null ?
@@ -112,6 +122,7 @@
   /**
    * Convert a input value to a number for persistence.
    * If the conversion fails, return original string.
+   * 转化成数字
    */
   function toNumber(val) {
     var n = parseFloat(val);
@@ -121,6 +132,7 @@
   /**
    * Make a map and return a function for checking if a key
    * is in that map.
+   * 创建一个map 并且可以选择要不要转化成小写
    */
   function makeMap(
     str,
@@ -142,16 +154,19 @@
 
   /**
    * Check if a tag is a built-in tag.
+   * 检查标签是否是内置标签
    */
   var isBuiltInTag = makeMap('slot,component', true);
 
   /**
    * Check if a attribute is a reserved attribute.
+   * 检查属性是否为保留属性。
    */
   var isReservedAttribute = makeMap('key,ref,slot,slot-scope,is');
 
   /**
    * Remove an item from an array
+   * 从阵列中移除一个项目
    */
   function remove(arr, item) {
     if (arr.length) {
@@ -166,13 +181,14 @@
    * Check whether the object has the property.
    */
   var hasOwnProperty = Object.prototype.hasOwnProperty;
-
+  // 检查是否包含  OwnProperty
   function hasOwn(obj, key) {
     return hasOwnProperty.call(obj, key)
   }
 
   /**
    * Create a cached version of a pure function.
+   * 创建一个纯函数的缓存版本。
    */
   function cached(fn) {
     var cache = Object.create(null);
@@ -184,6 +200,7 @@
 
   /**
    * Camelize a hyphen-delimited string.
+   * Camelize用连字符分隔的字符串。
    */
   var camelizeRE = /-(\w)/g;
   var camelize = cached(function (str) {
@@ -194,6 +211,7 @@
 
   /**
    * Capitalize a string.
+   * 大写一个字符串。
    */
   var capitalize = cached(function (str) {
     return str.charAt(0).toUpperCase() + str.slice(1)
@@ -201,6 +219,7 @@
 
   /**
    * Hyphenate a camelCase string.
+   * 把驼峰连接改成 短线链接
    */
   var hyphenateRE = /\B([A-Z])/g;
   var hyphenate = cached(function (str) {
@@ -215,7 +234,10 @@
    * backwards compatibility.
    */
 
-  /* istanbul ignore next */
+  /** 
+   * istanbul ignore next 
+   * 冒充执行 
+   * */
   function polyfillBind(fn, ctx) {
     function boundFn(a) {
       var l = arguments.length;
@@ -230,6 +252,7 @@
     return boundFn
   }
 
+  // bind快捷方法
   function nativeBind(fn, ctx) {
     return fn.bind(ctx)
   }
@@ -240,6 +263,7 @@
 
   /**
    * Convert an Array-like object to a real Array.
+   * 把类数组转化成真实数组
    */
   function toArray(list, start) {
     start = start || 0;
@@ -253,6 +277,7 @@
 
   /**
    * Mix properties into target object.
+   * 将属性混合到目标对象中。
    */
   function extend(to, _from) {
     for (var key in _from) {
@@ -263,6 +288,7 @@
 
   /**
    * Merge an Array of Objects into a single Object.
+   * 将一个对象数组合并成一个对象。
    */
   function toObject(arr) {
     var res = {};
@@ -297,6 +323,7 @@
 
   /**
    * Generate a static keys string from compiler modules.
+   * 从编译器模块生成一个静态键字符串。
    */
   function genStaticKeys(modules) {
     return modules.reduce(function (keys, m) {
@@ -307,6 +334,8 @@
   /**
    * Check if two values are loosely equal - that is,
    * if they are plain objects, do they have the same shape?
+   * 检查两个值是否大致相等
+   * 也就是说，如果它们是普通物体，它们是否具有相同的形状？
    */
   function looseEqual(a, b) {
     if (a === b) {
@@ -354,6 +383,7 @@
 
   /**
    * Ensure a function is called only once.
+   * 确保只调用一次函数。
    */
   function once(fn) {
     var called = false;
@@ -367,12 +397,14 @@
 
   var SSR_ATTR = 'data-server-rendered';
 
+  // 模块，指令，过滤器
   var ASSET_TYPES = [
     'component',
     'directive',
     'filter'
   ];
 
+  // 生命周期
   var LIFECYCLE_HOOKS = [
     'beforeCreate',
     'created',
@@ -388,51 +420,60 @@
   ];
 
   /*  */
-
+  // vue配置
   var config = ({
     /**
      * Option merge strategies (used in core/util/options)
+     * 选项合并策略（用于core / util / options）
      */
     // $flow-disable-line
     optionMergeStrategies: Object.create(null),
 
     /**
      * Whether to suppress warnings.
+     * 是否支持警告
      */
     silent: false,
 
     /**
      * Show production mode tip message on boot?
+     * 在启动时显示生产模式提示信息？
      */
     productionTip: "development" !== 'production',
 
     /**
      * Whether to enable devtools
+     * 是否启用devtools
      */
     devtools: "development" !== 'production',
 
     /**
      * Whether to record perf
+     * 是否记录perf
      */
     performance: false,
 
     /**
      * Error handler for watcher errors
+     * 观察者错误的错误处理程序
      */
     errorHandler: null,
 
     /**
      * Warn handler for watcher warns
+     * 观察者错误的警告处理程序
      */
     warnHandler: null,
 
     /**
      * Ignore certain custom elements
+     * 忽略某些自定义元素
      */
     ignoredElements: [],
 
     /**
      * Custom user key aliases for v-on
+     * v-on的自定义用户键别名
      */
     // $flow-disable-line
     keyCodes: Object.create(null),
@@ -440,39 +481,46 @@
     /**
      * Check if a tag is reserved so that it cannot be registered as a
      * component. This is platform-dependent and may be overwritten.
+     * 检查一个标签是否被保留，以便它不能被注册为一个组件。 这取决于平台，可能会被覆盖。
      */
     isReservedTag: no,
 
     /**
      * Check if an attribute is reserved so that it cannot be used as a component
      * prop. This is platform-dependent and may be overwritten.
+     * 检查一个属性是否被保留，以便它不能被注册为一个组件。 这取决于平台，可能会被覆盖。
      */
     isReservedAttr: no,
 
     /**
      * Check if a tag is an unknown element.
      * Platform-dependent.
+     * 检查标签是否是未知元素。
      */
     isUnknownElement: no,
 
     /**
      * Get the namespace of an element
+     * 获取元素的名称空间
      */
     getTagNamespace: noop,
 
     /**
      * Parse the real tag name for the specific platform.
+     * 解析特定平台的真实标签名称。
      */
     parsePlatformTagName: identity,
 
     /**
      * Check if an attribute must be bound using property, e.g. value
      * Platform-dependent.
+     * 检查属性是否必须使用属性绑定，例如 值
      */
     mustUseProp: no,
 
     /**
      * Exposed for legacy reasons
+     * 由于遗留原因而暴露
      */
     _lifecycleHooks: LIFECYCLE_HOOKS
   })
@@ -481,6 +529,7 @@
 
   /**
    * Check if a string starts with $ or _
+   * 检查一个字符串是以$或_开头的
    */
   function isReserved(str) {
     var c = (str + '').charCodeAt(0);
@@ -489,6 +538,7 @@
 
   /**
    * Define a property.
+   * 定义一个属性。
    */
   function def(obj, key, val, enumerable) {
     Object.defineProperty(obj, key, {
@@ -526,18 +576,32 @@
   var hasProto = '__proto__' in {};
 
   // Browser environment sniffing
+  /**
+   * 判定执行在什么环境
+   */
+  // 浏览器
   var inBrowser = typeof window !== 'undefined';
+  // App
   var inWeex = typeof WXEnvironment !== 'undefined' && !!WXEnvironment.platform;
+  // 平台
   var weexPlatform = inWeex && WXEnvironment.platform.toLowerCase();
+  // userAgent
   var UA = inBrowser && window.navigator.userAgent.toLowerCase();
+  // IE
   var isIE = UA && /msie|trident/.test(UA);
+  // IE9
   var isIE9 = UA && UA.indexOf('msie 9.0') > 0;
+  // Edge
   var isEdge = UA && UA.indexOf('edge/') > 0;
+  // 安卓
   var isAndroid = (UA && UA.indexOf('android') > 0) || (weexPlatform === 'android');
+  // ios
   var isIOS = (UA && /iphone|ipad|ipod|ios/.test(UA)) || (weexPlatform === 'ios');
+  // Chrome
   var isChrome = UA && /chrome\/\d+/.test(UA) && !isEdge;
 
   // Firefox has a "watch" function on Object.prototype...
+  // 可能是为了解决和 Firefox 里对象的 watch 方法有重复
   var nativeWatch = ({}).watch;
 
   var supportsPassive = false;
@@ -556,6 +620,7 @@
 
   // this needs to be lazy-evaled because vue may be required before
   // vue-server-renderer can set VUE_ENV
+  // 是否为 vue-server-renderer
   var _isServer;
   var isServerRendering = function () {
     if (_isServer === undefined) {
